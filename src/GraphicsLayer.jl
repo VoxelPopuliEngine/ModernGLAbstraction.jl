@@ -9,5 +9,6 @@ include("./errors.jl")
 include("./glassert.jl")
 include("./stubs.jl")
 include("./types.jl")
+include("./lifetimes.jl")
 
 end # module
