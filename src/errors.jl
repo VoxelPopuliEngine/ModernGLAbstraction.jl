@@ -13,9 +13,11 @@ end
 
 
 struct StateError <: Exception
+    object
     msg::AbstractString
+    StateError(object = missing, msg::AbstractString = "") = new(object, string(msg))
+    StateError(msg::AbstractString) = new(missing, string(msg))
 end
-StateError() = StateError("")
 
 
 export OpenGLError, InvalidEnumGLError, InvalidValueGLError, InvalidOperationGLError, StackOverflowGLError, StackUnderflowGLError, OutOfMemoryGLError, InvalidFramebufferOperationGLError, ContextLostGLError, TableTooLargeGLError
