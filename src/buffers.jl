@@ -192,6 +192,8 @@ function buffer_download(buff::Buffer, size::Integer; offset::Integer = 0)
 end
 
 function ExtraFun.use(buff::Buffer)
+    if !isvalid(buff) throw(StateError(buff, "buffer has been destroyed")) end
+    
     ModernGL.glBindBuffer(glenum(typeof(buff)), glid(buff))
     @glassert begin
         InvalidEnum  => ImplementationError("invalid target")
