@@ -45,7 +45,7 @@ export GLBufferType, ArrayBufferType, ElementArrayBufferType, TextureBufferType,
 
 export ArrayBuffer, ElementArrayBuffer, TextureBuffer, UniformBuffer
 mutable struct GLBuffer{S} <: Buffer
-    glid::Int
+    glid::UInt32
     function GLBuffer{S}(glid) where S
         if !isa(S, GLBufferType)
             throw(ArgumentError("Invalid parameter: not a GLBufferType"))
@@ -207,12 +207,12 @@ function Base.close(buff::Buffer)
         @glassert begin
             InvalidValue => @should_never_reach
         end
-        buff.glid = -1
+        buff.glid = 0
     end
     buff
 end
 
-Base.isvalid(buff::Buffer) = glid(buff) >= 0
+Base.isvalid(buff::Buffer) = glid(buff) > 0
 Base.size(buff::Buffer) = parameter(buff, ModernGL.GL_BUFFER_SIZE)
 
 export buffer_usage, buffer_mapped
