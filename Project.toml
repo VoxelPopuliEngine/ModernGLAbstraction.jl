@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 ExtraFun = "963d7961-7533-4a80-bf6b-d3653d506006"
+GenerateProperties = "ad744131-fa5b-4912-8d03-4395d7e5240b"
 ModernGL = "66fc600b-dfda-50eb-8b99-91cfa97b1301"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 RuntimeEnums = "5aed96f1-df88-482a-81d7-fb30b91491f6"
@@ -12,6 +13,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 ExtraFun = "1.7"
+GenerateProperties = "0.1"
 ModernGL = "1.1.2"
 Reexport = "1.0"
 RuntimeEnums = "1.0"
