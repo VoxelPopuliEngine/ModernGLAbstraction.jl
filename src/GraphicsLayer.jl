@@ -12,6 +12,7 @@ include("./types.jl")
 include("./lifetimes.jl")
 include("./utils.jl") 
 
+include("./fragfilters.jl")
 include("./buffers.jl")
 
 end # module
