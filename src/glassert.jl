@@ -6,11 +6,17 @@
 using ModernGL
 using ExtraFun: decamelcase
 
+macro glassert()
+    quote
+        err = ModernGL.glGetError()
+        err === ModernGL.GL_NO_ERROR || throw(OpenGLError(err))
+    end
+end
 macro glassert(blk::Expr)
     @assert blk.head === :block
     replace!(expr -> transmute_glerror(:err, expr), blk.args)
     prepend!(blk.args, (:(err = ModernGL.glGetError()),))
-    append!(blk.args, (:(err !== ModernGL.GL_NO_ERROR && throw(OpenGLError(err))),))
+    push!(blk.args, :(err === ModernGL.GL_NO_ERROR || throw(OpenGLError(err))))
     blk
 end
 
