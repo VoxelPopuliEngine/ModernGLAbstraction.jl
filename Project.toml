@@ -12,7 +12,7 @@ RuntimeEnums = "5aed96f1-df88-482a-81d7-fb30b91491f6"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
-ExtraFun = "1.7"
+ExtraFun = "1.8.1"
 GenerateProperties = "0.1"
 ModernGL = "1.1.2"
 Reexport = "1.0"
