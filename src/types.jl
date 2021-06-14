@@ -8,9 +8,18 @@ export Vec, Vec2, Vec3, Vec4
 const Vec{N, T} = SVector{N, T}
 # Generate invariants using `eval`
 for N ∈ 1:4
-    eval(Expr(:const, Expr(:(=), Expr(:curly, Symbol("Vec$N"), :T), Expr(:curly, :Vec, N, :T))))
+    let
+        lhs, rhs = Expr(:curly, Symbol("Vec$N"), :T), Expr(:curly, :Vec, N, :T)
+        eval(Expr(:const, Expr(:(=), lhs, rhs)))
+        eval(Expr(:export, lhs.args[1]))
+    end
+    
     for (suffix, T) ∈ ('b' => Bool, 'i' => Int32, "ui" => UInt32, 'f' => Float32, 'd' => Float64)
-        eval(Expr(:const, Expr(:(=), Symbol("Vec$(N)$(suffix)"), Expr(:curly, :Vec, N, T))))
+        let
+            lhs, rhs = Symbol("Vec$(N)$(suffix)"), Expr(:curly, :Vec, N, T)
+            eval(Expr(:const, Expr(:(=), lhs, rhs)))
+            eval(Expr(:export, lhs))
+        end
     end
 end
 
@@ -19,16 +28,24 @@ const Mat{N, M, T} = SMatrix{N, M, T}
 const MatN{N, T} = Mat{N, N, T}
 for N ∈ 2:4
     for M ∈ 2:4
-        if N == M
-            eval(Expr(:const, Expr(:(=), Expr(:curly, Symbol("Mat$N"), :T), Expr(:curly, :Mat, N, N, :T))))
-        else
-            eval(Expr(:const, Expr(:(=), Expr(:curly, Symbol("Mat$(N)x$(M)"), :T), Expr(:curly, :Mat, N, M, :T))))
+        let
+            lhs, rhs = if N == M
+                Expr(:curly, Symbol("Mat$N"), :T), Expr(:curly, :Mat, N, N, :T)
+            else
+                Expr(:curly, Symbol("Mat$(N)x$(M)"), :T), Expr(:curly, :Mat, N, M, :T)
+            end
+            eval(Expr(:const, Expr(:(=), lhs, rhs)))
+            eval(Expr(:export, lhs.args[1]))
         end
         for (suffix, T) ∈ ('b' => Bool, 'i' => Int32, "ui" => UInt32, 'f' => Float32, 'd' => Float64)
-            if N == M
-                eval(Expr(:const, Expr(:(=), Symbol("Mat$(N)$(suffix)"), Expr(:curly, :Mat, N, N, T))))
-            else
-                eval(Expr(:const, Expr(:(=), Symbol("Mat$(N)x$(M)$(suffix)"), Expr(:curly, :Mat, N, M, T))))
+            let
+                lhs, rhs = if N == M
+                    Symbol("Mat$(N)$(suffix)"), Expr(:curly, :Mat, N, N, T)
+                else
+                    Symbol("Mat$(N)x$(M)$(suffix)"), Expr(:curly, :Mat, N, M, T)
+                end
+                eval(Expr(:const, Expr(:(=), lhs, rhs)))
+                eval(Expr(:export, lhs))
             end
         end
     end
