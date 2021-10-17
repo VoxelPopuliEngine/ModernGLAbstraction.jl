@@ -14,5 +14,14 @@ include("./utils.jl")
 
 include("./fragfilters.jl")
 include("./buffers.jl")
+include("./shaders.jl")
+include("./uniforms.jl")
+# include("./layouts.jl")
+# include("./textures.jl")
+
+# include("./Draws.jl")
+# include("./Uniforms.jl")
+
+# include("./TextureUtils.jl")
 
 end # module
