@@ -5,6 +5,7 @@
 
 nothrow(cb) = (cb(); true)
 
-include("./Test.Lifetimes.jl")
-include("./Test.Buffers.jl")
-include("./Test.Shaders.jl")
+include("./test_lifetimes.jl")
+include("./test_buffers.jl")
+include("./test_shaders.jl")
+include("./test_textures.jl")
