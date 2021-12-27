@@ -354,7 +354,7 @@ function Base.size(tex::Texture2DBase; level::Integer = 1)
     InvalidValue => MipMapLevelError(level)
   end
   
-  width[], ref[]
+  width[], height[]
 end
 
 export generate_mipmaps
