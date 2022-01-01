@@ -3,7 +3,7 @@
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 @reexport module FragFilters
-using ExtraFun: Ident
+using KirUtil: Ident
 using ModernGL
 using ..ModernGLAbstraction
 

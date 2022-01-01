@@ -2,7 +2,7 @@
 # Utility functions used throughout the library
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
-using ExtraFun
+using KirUtil
 using ModernGL
 
 function bytes(x; mapper = identity)

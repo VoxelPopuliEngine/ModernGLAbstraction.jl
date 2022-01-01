@@ -3,7 +3,7 @@
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 @reexport module Textures
-using ExtraFun
+using KirUtil
 using ModernGL
 using ..ModernGLAbstraction
 import ..ModernGLAbstraction: @glassert, glsymbol
@@ -374,7 +374,7 @@ function get_internal_format(tex::Texture, level::Integer = 1)
   ref[]
 end
 
-function ExtraFun.use(tex::Texture; unit::Integer = 1)
+function KirUtil.use(tex::Texture; unit::Integer = 1)
   ModernGL.glActiveTexture(ModernGL.GL_TEXTURE0 + unit-1)
   @glassert begin
     InvalidEnum => ArgumentError("texture unit $unit ∉ [1, $(maxtexturecount())]")

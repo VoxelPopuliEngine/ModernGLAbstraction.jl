@@ -3,9 +3,9 @@
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LPGP-2.1
 @reexport module Shaders
-import ExtraFun
+import KirUtil
 import ModernGL
-using ExtraFun: Ident, decamelcase
+using KirUtil: Ident, decamelcase
 using GenerateProperties
 using ..ModernGLAbstraction
 using ..ModernGLAbstraction: glenum, glid, glstate, StateError, ImplementationError, @glassert
@@ -324,7 +324,7 @@ function finduniform(prog::Program, name::String)
 end
 
 
-function ExtraFun.use(prog::Program)
+function KirUtil.use(prog::Program)
     !isvalid(prog) && throw(StateError(prog, "invalid shader program"))
     
     ModernGL.glUseProgram(glid(prog))

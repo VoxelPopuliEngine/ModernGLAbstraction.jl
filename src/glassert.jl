@@ -4,7 +4,7 @@
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 using ModernGL
-using ExtraFun: decamelcase
+using KirUtil: decamelcase
 
 macro glassert()
     quote

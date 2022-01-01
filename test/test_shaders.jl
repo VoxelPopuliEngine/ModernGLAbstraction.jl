@@ -4,7 +4,7 @@
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 module TestShaders
 using Test
-using ExtraFun
+using KirUtil
 using GLFWAbstraction
 using Main: nothrow
 using ModernGLAbstraction

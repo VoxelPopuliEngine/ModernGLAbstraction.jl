@@ -6,10 +6,10 @@
 using Base: isiterable
 using ModernGL
 using StaticArrays
-using ExtraFun: iterable, Optional, Unknown, unknown
+using KirUtil: iterable, Optional, Unknown, unknown
 using ModernGLAbstraction
 using ..ModernGLAbstraction: glsymbol, StateError, ImplementationError, @glassert
-import ExtraFun
+import KirUtil
 
 
 export Uniform
@@ -22,13 +22,13 @@ end
 Uniform{T}(prog::Program, name::Symbol) where T = Uniform{T}(prog, name, ModernGLAbstraction.Shaders.finduniform(prog, name), unknown)
 Uniform(T::Type, prog::Program, name::Symbol) = Uniform{T}(prog, name)
 
-function ExtraFun.load(uniform::Uniform)
+function KirUtil.load(uniform::Uniform)
     name = string(uniform.name)
     ref  = Ref{UInt32}()
     ModernGL.glGetUniformIndices(uniform.prog, 1, pointer([pointer(name)]), ref)
     uniform.index = ref[]
 end
-ExtraFun.isunknown(uniform::Uniform) = isunknown(uniform.index)
+KirUtil.isunknown(uniform::Uniform) = isunknown(uniform.index)
 
 
 export uniform

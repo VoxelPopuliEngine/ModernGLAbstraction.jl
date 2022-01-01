@@ -4,7 +4,7 @@
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 @reexport module Buffers
 import ModernGL
-using ExtraFun
+using KirUtil
 using RuntimeEnums
 using StaticArrays
 using ..ModernGLAbstraction
@@ -191,7 +191,7 @@ function buffer_download(buff::Buffer, size::Integer; offset::Integer = 0)
     return ret
 end
 
-function ExtraFun.use(buff::Buffer)
+function KirUtil.use(buff::Buffer)
     if !isvalid(buff) throw(StateError(buff, "buffer has been destroyed")) end
     
     ModernGL.glBindBuffer(glenum(typeof(buff)), glid(buff))
