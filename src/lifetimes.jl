@@ -3,7 +3,7 @@
 # -----
 # Licensed under LGPL-2.1
 @reexport module Lifetimes
-import ..GraphicsLayer
+import ..ModernGLAbstraction
 
 const Optional{T} = Union{T, Nothing}
 
@@ -33,7 +33,7 @@ function lifetime(cb, parent::Union{Lifetime, Nothing} = nothing)
 end
 
 function Base.close(lt::Lifetime)
-    if !GraphicsLayer.isterminating(lt) && !GraphicsLayer.isterminating(lt.parent)
+    if !ModernGLAbstraction.isterminating(lt) && !ModernGLAbstraction.isterminating(lt.parent)
         close.(lt.resources)
         lt.resources = Set()
     end

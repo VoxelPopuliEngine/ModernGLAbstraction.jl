@@ -7,8 +7,8 @@ import ModernGL
 using ExtraFun
 using RuntimeEnums
 using StaticArrays
-using ..GraphicsLayer
-import ..GraphicsLayer: bytes, glenum, glid, @glassert, @should_never_reach
+using ..ModernGLAbstraction
+import ..ModernGLAbstraction: bytes, glenum, glid, @glassert, @should_never_reach
 
 const Optional{T} = Union{T, Nothing}
 
@@ -57,11 +57,11 @@ const ArrayBuffer        = GLBuffer{ArrayBufferType}
 const ElementArrayBuffer = GLBuffer{ElementArrayBufferType}
 const TextureBuffer      = GLBuffer{TextureBufferType}
 const UniformBuffer      = GLBuffer{UniformBufferType}
-GraphicsLayer.glenum(::Type{GLBuffer{ArrayBufferType}}) = ModernGL.GL_ARRAY_BUFFER
-GraphicsLayer.glenum(::Type{GLBuffer{ElementArrayBufferType}}) = ModernGL.GL_ELEMENT_ARRAY_BUFFER
-GraphicsLayer.glenum(::Type{GLBuffer{TextureBufferType}}) = ModernGL.GL_TEXTURE_BUFFER
-GraphicsLayer.glenum(::Type{GLBuffer{UniformBufferType}}) = ModernGL.GL_UNIFORM_BUFFER
-GraphicsLayer.glid(buff::GLBuffer) = buff.glid
+ModernGLAbstraction.glenum(::Type{GLBuffer{ArrayBufferType}}) = ModernGL.GL_ARRAY_BUFFER
+ModernGLAbstraction.glenum(::Type{GLBuffer{ElementArrayBufferType}}) = ModernGL.GL_ELEMENT_ARRAY_BUFFER
+ModernGLAbstraction.glenum(::Type{GLBuffer{TextureBufferType}}) = ModernGL.GL_TEXTURE_BUFFER
+ModernGLAbstraction.glenum(::Type{GLBuffer{UniformBufferType}}) = ModernGL.GL_UNIFORM_BUFFER
+ModernGLAbstraction.glid(buff::GLBuffer) = buff.glid
 
 buffertype(::Union{Type{GLBuffer{S}}, GLBuffer{S}}) where S = S
 

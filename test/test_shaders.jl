@@ -7,9 +7,9 @@ using Test
 using ExtraFun
 using GLFWAbstraction
 using Main: nothrow
-using GraphicsLayer
-using GraphicsLayer: StateError
-using GraphicsLayer.Shaders: findattribute, finduniform
+using ModernGLAbstraction
+using ModernGLAbstraction: StateError
+using ModernGLAbstraction.Shaders: findattribute, finduniform
 import ModernGL
 
 const vsh_src_basic = """

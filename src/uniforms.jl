@@ -7,8 +7,8 @@ using Base: isiterable
 using ModernGL
 using StaticArrays
 using ExtraFun: iterable, Optional, Unknown, unknown
-using GraphicsLayer
-using ..GraphicsLayer: glsymbol, StateError, ImplementationError, @glassert
+using ModernGLAbstraction
+using ..ModernGLAbstraction: glsymbol, StateError, ImplementationError, @glassert
 import ExtraFun
 
 
@@ -19,7 +19,7 @@ struct Uniform{T}
     location::Int32
     index::Optional{:uniform_index, UInt32}
 end
-Uniform{T}(prog::Program, name::Symbol) where T = Uniform{T}(prog, name, GraphicsLayer.Shaders.finduniform(prog, name), unknown)
+Uniform{T}(prog::Program, name::Symbol) where T = Uniform{T}(prog, name, ModernGLAbstraction.Shaders.finduniform(prog, name), unknown)
 Uniform(T::Type, prog::Program, name::Symbol) = Uniform{T}(prog, name)
 
 function ExtraFun.load(uniform::Uniform)
@@ -131,7 +131,7 @@ end
 # Test whether uniform is valid.
 # WARNING: This is a comparatively resource intense algorithm and should be avoided in a production build.
 function Base.isvalid(uni::Uniform{T}) where T
-    uni.location == GraphicsLayer.Shaders.finduniform(uni.prog, uni.name) || error("uniform location mismatch")
+    uni.location == ModernGLAbstraction.Shaders.finduniform(uni.prog, uni.name) || error("uniform location mismatch")
     uni.location > -1 || error("negative uniform location")
     glsymbol(T) == parameter(uni.prog, uni.name, ModernGL.GL_UNIFORM_TYPE)
 end

@@ -1,4 +1,4 @@
-name = "GraphicsLayer"
+name = "ModernGLAbstraction"
 uuid = "715ac8d3-df97-4447-9c1f-a6ca368da29f"
 authors = ["Kiruse <kiruse@kiruse.dev>"]
 version = "0.1.0"

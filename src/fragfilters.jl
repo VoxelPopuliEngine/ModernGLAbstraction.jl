@@ -5,7 +5,7 @@
 @reexport module FragFilters
 using ExtraFun: Ident
 using ModernGL
-using ..GraphicsLayer
+using ..ModernGLAbstraction
 
 export depthfunc, stencilfunc
 export stencilop

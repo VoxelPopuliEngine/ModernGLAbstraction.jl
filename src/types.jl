@@ -1,5 +1,5 @@
 ######################################################################
-# GraphicsLayer abstract type definitions
+# ModernGLAbstraction abstract type definitions
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 using StaticArrays

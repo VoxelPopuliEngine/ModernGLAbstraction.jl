@@ -4,7 +4,7 @@
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 module TestLifetimes
 using Test
-using GraphicsLayer.Lifetimes
+using ModernGLAbstraction.Lifetimes
 
 function nothrow(cb)
     cb()

@@ -1,10 +1,10 @@
 ######################################################################
-# Unit Test for GraphicsLayer OpenGL buffer abstraction
+# Unit Test for ModernGLAbstraction OpenGL buffer abstraction
 # -----
 # Copyright (c) Kiruse 2021. Licensed under LGPL-2.1
 using ExtraFun
 using GLFWAbstraction
-using GraphicsLayer.Textures
+using ModernGLAbstraction.Textures
 using Test
 
 let wnd = window(:texture_test, "Texture Test", 960, 540)

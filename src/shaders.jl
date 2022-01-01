@@ -7,8 +7,8 @@ import ExtraFun
 import ModernGL
 using ExtraFun: Ident, decamelcase
 using GenerateProperties
-using ..GraphicsLayer
-using ..GraphicsLayer: glenum, glid, glstate, StateError, ImplementationError, @glassert
+using ..ModernGLAbstraction
+using ..ModernGLAbstraction: glenum, glid, glstate, StateError, ImplementationError, @glassert
 
 macro generate_shader_types(blk::Expr)
     @assert blk.head === :block
@@ -36,7 +36,7 @@ macro generate_shader_types(blk::Expr)
         push!(enums.args, enum)
         push!(res.args, :(export $var))
         push!(res.args, :(const $var = GLShader{$enum}))
-        push!(res.args, :(GraphicsLayer.glenum(::Type{GLShader{$enum}}) = $value))
+        push!(res.args, :(ModernGLAbstraction.glenum(::Type{GLShader{$enum}}) = $value))
     end
     
     return esc(res)

@@ -5,8 +5,8 @@
 @reexport module Textures
 using ExtraFun
 using ModernGL
-using ..GraphicsLayer
-import ..GraphicsLayer: @glassert, glsymbol
+using ..ModernGLAbstraction
+import ..ModernGLAbstraction: @glassert, glsymbol
 
 const Optional{T} = Union{T, Nothing}
 
@@ -24,7 +24,7 @@ struct Texture2DBase{N} <: Texture
   glid::Integer
 end
 const Texture2D = Texture2DBase{4}
-GraphicsLayer.glsymbol(::Type{<:Texture2DBase}) = ModernGL.GL_TEXTURE_2D
+ModernGLAbstraction.glsymbol(::Type{<:Texture2DBase}) = ModernGL.GL_TEXTURE_2D
 
 export DSTextureBase, DSTexture
 """`DSTexture{N}` is a specialization of a `Texture2D{N}` for depth and/or stencil components. Accordingly,
@@ -34,8 +34,8 @@ struct DSTextureBase{N} <: Texture
 end
 const DSTexture = DSTextureBase{2}
 
-GraphicsLayer.glenum(::Type{<:Texture2DBase}) = :GL_TEXTURE_2D
-GraphicsLayer.glenum(::Type{<:DSTextureBase}) = :GL_TEXTURE_2D
+ModernGLAbstraction.glenum(::Type{<:Texture2DBase}) = :GL_TEXTURE_2D
+ModernGLAbstraction.glenum(::Type{<:DSTextureBase}) = :GL_TEXTURE_2D
 
 export texture_channels
 texture_channels(::Type{Texture2DBase{N}}) where N = N
@@ -62,7 +62,7 @@ end
 
 function texture(tex_t::Type{<:Texture}, n::Integer = 1; lifetime::Optional{Lifetime} = nothing)
   if !(typeof(tex_t) <: DataType)
-    throw(TypeError(:texture, "GraphicsLayer.Textures", DataType, typeof(tex_t)))
+    throw(TypeError(:texture, "ModernGLAbstraction.Textures", DataType, typeof(tex_t)))
   end
   ids = zeros(UInt32, n)
   ModernGL.glGenTextures(n, pointer(ids))
