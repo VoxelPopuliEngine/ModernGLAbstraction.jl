@@ -61,6 +61,23 @@ let wnd = window(:texture_test, "Texture Test", 960, 540)
             @test isapprox(download_texture(T, tex), clipped; atol=0.01)
           end
         end
+        
+        lifetime() do lt
+          T = Float32
+          
+          data = reshape(
+            [Vec4{T}((0.1i for _ in 0:3)...) for i in 1:16],
+            (4, 4)
+          )
+          clipped = reshape(
+            [Vec4{T}((min(c, 1.0) for c in data[y, x])...) for x in 1:4 for y in 1:4],
+            (4, 4)
+          )
+          
+          let tex = texture(Texture2D, data; lifetime=lt)
+            @test isapprox(download_texture(T, tex), clipped; atol=0.01)
+          end
+        end
       end
       
       @testset "screenshot" begin
