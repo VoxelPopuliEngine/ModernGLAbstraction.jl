@@ -82,6 +82,7 @@ glname(::Type{Int16})   = :GL_SHORT
 glname(::Type{UInt16})  = :GL_UNSIGNED_SHORT
 glname(::Type{Int32})   = :GL_INT
 glname(::Type{UInt32})  = :GL_UNSIGNED_INT
+glname(::Type{Float16}) = :GL_HALF_FLOAT
 glname(::Type{Float32}) = :GL_FLOAT
 glname(::Type{Float64}) = :GL_DOUBLE
 glname(::Type{Vec{N, T}}) where {N, T<:Union{Bool, UInt32, Int32, Float32, Float64}} = N ∈ 2:4 ? Symbol(string(glname(T)) * "_VEC$N") : throw(ArgumentError("invalid vector size $N, expected ∈ 2:4"))
