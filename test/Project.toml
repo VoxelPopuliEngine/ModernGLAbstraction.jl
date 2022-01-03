@@ -3,3 +3,7 @@ GLFWAbstraction = "b4519675-ec9c-4dd5-a759-fbb42bea0e46"
 KirUtil = "35055d32-6816-4a65-8aeb-d6e3aca393e8"
 ModernGL = "66fc600b-dfda-50eb-8b99-91cfa97b1301"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+GLFWAbstraction = "0.2.2"
+KirUtil = "0.1"

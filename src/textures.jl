@@ -24,7 +24,6 @@ struct Texture2DBase{N} <: Texture
   glid::Integer
 end
 const Texture2D = Texture2DBase{4}
-ModernGLAbstraction.glsymbol(::Type{<:Texture2DBase}) = ModernGL.GL_TEXTURE_2D
 
 export DSTextureBase, DSTexture
 """`DSTexture{N}` is a specialization of a `Texture2D{N}` for depth and/or stencil components. Accordingly,
@@ -34,8 +33,10 @@ struct DSTextureBase{N} <: Texture
 end
 const DSTexture = DSTextureBase{2}
 
-ModernGLAbstraction.glenum(::Type{<:Texture2DBase}) = :GL_TEXTURE_2D
-ModernGLAbstraction.glenum(::Type{<:DSTextureBase}) = :GL_TEXTURE_2D
+ModernGLAbstraction.glname(::Type{<:Texture2DBase}) = :GL_TEXTURE_2D
+ModernGLAbstraction.glname(::Type{<:DSTextureBase}) = :GL_TEXTURE_2D
+ModernGLAbstraction.glenum(::Type{<:Texture2DBase}) = ModernGL.GL_TEXTURE_2D
+ModernGLAbstraction.glenum(::Type{<:DSTextureBase}) = ModernGL.GL_TEXTURE_2D
 
 export texture_channels
 texture_channels(::Type{Texture2DBase{N}}) where N = N
@@ -48,12 +49,11 @@ function texture(
     tex_t::Type{<:Texture2DBase},
     data::AbstractMatrix;
     level::Integer = 1,
-    border::Integer = 0,
     generate_mipmaps::Bool = false,
     lifetime::Optional{Lifetime} = nothing
   )
   tex = texture(tex_t; lifetime=lifetime)
-  upload_texture(tex, data, level=level, border=border)
+  upload_texture(tex, data, level=level)
   if generate_mipmaps
     generate_mipmaps(tex)
   end
@@ -85,7 +85,7 @@ end
 
 # RGBA Texture
 export upload_texture
-"""`upload_texture(tex::Texture2DBase, img::AbstractMatrix; level = 1, border = 0)`
+"""`upload_texture(tex::Texture2DBase, img::AbstractMatrix; level = 1)`
  
  Upload a given RGBA texture `img` to the GPU & associate it with the given OpenGL texture resource `tex`.
  
@@ -100,30 +100,28 @@ export upload_texture
  
  See https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexImage2D.xhtml for more details.
  """
-function upload_texture(tex::Texture2DBase{C}, img::AbstractMatrix{V}; level::Integer = 1, border::Integer = 0) where {C, V<:Vec}
+function upload_texture(tex::Texture2DBase{C}, img::AbstractMatrix{V}; level::Integer = 1) where {C, V<:Vec}
   upload_texture_internal(
     tex,
     color_format(C),
     img,
     color_format(length(V)),
     eltype(V),
-    level,
-    border
+    level
   )
 end
-function upload_texture(tex::Texture2DBase{C}, img::AbstractMatrix{P}; level::Integer = 1, border::Integer = 0) where {C, P<:Packed}
+function upload_texture(tex::Texture2DBase{C}, img::AbstractMatrix{P}; level::Integer = 1) where {C, P<:Packed}
   upload_texture_internal(
     tex,
     color_format(C),
     img,
     color_format(length(P)),
     P,
-    level,
-    border
+    level
   )
 end
 
-"""`upload_texture(tex::DSTextureBase, img::AbstractMatrix; level = 1, border = 0, stencil = false)`
+"""`upload_texture(tex::DSTextureBase, img::AbstractMatrix; level = 1, stencil = false)`
  
  Specialization of `upload_texture` for `DSTextureBase`s - alternate `Texture2DBase`s designed for textures storing
  depth & stencil components.
@@ -131,62 +129,57 @@ end
  If the image data has only a single channel (`AbstractMatrix{<:Number}`), `stencil` keyword argument may be provided to
  determine whether this channel represents stencil or depth component respectively.
  """
-function upload_texture(tex::DSTextureBase{1}, img::AbstractMatrix{<:Number}; level::Integer = 1, border::Integer = 0)
+function upload_texture(tex::DSTextureBase{1}, img::AbstractMatrix{<:Number}; level::Integer = 1)
   upload_texture_internal(
     tex,
     ModernGL.GL_DEPTH_COMPONENT,
     img,
     ModernGL.GL_DEPTH_COMPONENT,
     eltype(img),
-    level,
-    border
+    level
   )
 end
-function upload_texture(tex::DSTextureBase{2}, img::AbstractMatrix{<:Number}; level::Integer = 1, border::Integer = 0, stencil::Bool = false)
+function upload_texture(tex::DSTextureBase{2}, img::AbstractMatrix{<:Number}; level::Integer = 1, stencil::Bool = false)
   upload_texture_internal(
     tex,
     if stencil ModernGL.GL_DEPTH_STENCIL else ModernGL.GL_DEPTH_COMPONENT end,
     img,
     if stencil ModernGL.GL_STENCIL_INDEX else ModernGL.GL_DEPTH_COMPONENT end,
     eltype(img),
-    level,
-    border
+    level
   )
 end
-function upload_texture(tex::DSTextureBase{2}, img::AbstractMatrix{V}; level::Integer = 1, border::Integer = 0) where {V<:Vec2}
+function upload_texture(tex::DSTextureBase{2}, img::AbstractMatrix{V}; level::Integer = 1) where {V<:Vec2}
   upload_texture_internal(
     tex,
     ModernGL.GL_DEPTH_STENCIL,
     img,
     ModernGL.GL_DEPTH_STENCIL,
     eltype(V),
-    level,
-    border
+    level
   )
 end
 
 # Generic upload helper
 function upload_texture_internal(
     tex::Texture2DBase,
-    tex_format,
+    internal_format,
     img::AbstractMatrix,
-    img_format,
-    img_eltype::Type{<:Number},
+    texel_format,
+    E::Type{<:Number},
     level::Integer,
-    border::Integer,
   )
   use(tex)
   width, height = size(img)
   
   ModernGL.glTexImage2D(
-    glsymbol(typeof(tex)),
+    glenum(tex),
     level-1,
-    tex_format,
-    width, height,
-    border,
-    img_format,
-    glsymbol(img_eltype),
-    pointer(img)
+    internal_format,
+    width, height, 0,
+    texel_format,
+    glsymbol(E),
+    pointer(bytes(img))
   )
   @glassert begin
     InvalidValue => begin
@@ -194,8 +187,6 @@ function upload_texture_internal(
         ArgumentError("texture width ($width) or height ($height) > $(maxtexturesize())")
       elseif level-1 < 0 || level-1 > log(2, maxtexturesize())
         ArgumentError("mipmap level $(level-1) ∉ [0, $(log(2, maxtexturesize()))]")
-      elseif border != 0
-        ArgumentError("border argument must be 0")
       end
     end
   end
@@ -203,31 +194,62 @@ end
 
 # Download RGBA Texture
 export download_texture
-"""`download_texture(tex::Texture2DBase; level = 1, border = 0)`
+"""`download_texture(tex::Texture2DBase; level = 1)`
  
- Download image data associated with `tex` into `img`.
- 
- `eltype(img)` is used to determine pixel type and may be any of OpenGL's supported primitives or `Packed` types.
- 
- `format` describes the pixel format of the returned data. Currently, only specific formats are supported:
- 
- - `:rgba` - RGBA color components of the texture
- - `:ds` - depth & stencil components of the texture
+ Download image data associated with `tex` into a new `Matrix{UInt8}`.
  
  `level` designates the 1-based mipmap level.
  """
 function download_texture(tex::Texture2DBase; level::Integer = 1)
+  download_texture(UInt8, tex, level=level)
+end
+"""`download_texture(T::Type{<:Union{Number, Packed}}, tex::Texture2DBase; level = 1)`
+ 
+ Download image data associated with `tex` into a new `Matrix{Vec4{T}}`.
+ Size is automatically extracted from the OpenGL resource.
+ 
+ `T` may be any OpenGL-supported numeric type (`Float{16,32}`, `(U)Int{8,16,32}`) or a `Packed` type.
+ """
+function download_texture(T::Type{<:Number}, tex::Texture2DBase; level::Integer = 1)
   width, height = size(tex)
-  img = zeros(Vec4{UInt8}, width, height)
+  img = zeros(Vec4{T}, width, height)
   download_texture(tex, img, level=level)
 end
-function download_texture(tex::Texture2DBase, img::AbstractMatrix{<:Number}; level::Integer = 1)
+function download_texture(T::Type{<:Packed}, tex::Texture2DBase; level::Integer = 1)
+  width, height = size(tex)
+  img = zeros(T, width, height)
+  download_texture(tex, img, level=level)
+end
+"""`download_texture(tex, img::AbstractMatrix; level = 1, [channel], [stencil])`
+ 
+ Download image data associated with `tex` into a given `img`. Texel data type & channel count are extracted from the
+ provided matrix automatically.
+ 
+ Only if `tex` is a `Texture2DBase` and `img` is a `Matrix{<:Number}` (request 1 channel) one may specify the `channel` keyword argument to request a
+ certain color channel (`:red` (default), `:green`, `:blue`, `:alpha`).
+ 
+ Only if `tex` is a `DSTextureBase` and `img` is a `Matrix{<:Number}` (request 1 channel) one may specify the `stencil` keyword argument to request
+ either the depth (`stencil = false`, default) or stencil (`stencil = true`) component.
+ """
+function download_texture(tex::Texture2DBase, img::AbstractMatrix{<:Number}; level::Integer = 1, channel::Symbol = :red)
+  format = if channel == :red
+    ModernGL.GL_RED
+  elseif channel == :green
+    ModernGL.GL_GREEN
+  elseif channel == :blue
+    ModernGL.GL_BLUE
+  elseif channel == :alpha
+    ModernGL.GL_ALPHA
+  else
+    ArgumentError("invalid channel: $(channel)")
+  end
+  
   download_texture_internal(
     tex,
     img,
     level,
     eltype(img),
-    ModernGL.GL_RED
+    format
   )
 end
 function download_texture(tex::Texture2DBase, img::AbstractMatrix{V}; level::Integer = 1) where {N, V<:Vec{N}}
@@ -255,7 +277,11 @@ function download_texture(tex::DSTextureBase, img::AbstractMatrix{<:Number}; lev
     img,
     level,
     eltype(img),
-    if stencil ModernGL.GL_STENCIL_INDEX else ModernGL.GL_DEPTH_COMPONENT end
+    if stencil
+      ModernGL.GL_STENCIL_INDEX
+    else
+      ModernGL.GL_DEPTH_COMPONENT
+    end
   )
 end
 function download_texture(tex::DSTextureBase, img::AbstractMatrix{V}; level::Integer = 1) where {V<:Vec2}
@@ -277,13 +303,19 @@ function download_texture(tex::DSTextureBase, img::AbstractMatrix{P}; level::Int
   )
 end
 
-function download_texture_internal(tex::Texture2DBase, img::AbstractMatrix, level::Integer, E::Type{<:Number}, format)
+function download_texture_internal(
+    tex::Texture2DBase,
+    img::AbstractMatrix,
+    level::Integer,
+    E::Type{<:Union{Number, Packed}},
+    format
+  )
   ModernGL.glGetTextureImage(
     glid(tex),
-    level,
+    level-1,
     format, # of returned pixel data, not texture format
     glsymbol(E),
-    length(img) * sizeof(eltype(img)),
+    sizeof(img),
     pointer(img)
   )
   @glassert begin
@@ -302,6 +334,7 @@ function download_texture_internal(tex::Texture2DBase, img::AbstractMatrix, leve
       end
     end
   end
+  img
 end
 
 export screenshot

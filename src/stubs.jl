@@ -6,6 +6,7 @@
 export glenum, glid
 
 glenum() = throw(MethodError(glenum, ()))
+glenum(x) = glenum(typeof(x))
 glid(x) = x.glid
 glname() = throw(MethodError(glname, ()))
 glsymbol(name::Symbol) = getproperty(ModernGL, name)

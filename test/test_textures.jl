@@ -8,6 +8,8 @@ using ModernGLAbstraction.Textures
 using Test
 
 let wnd = window(:texture_test, "Texture Test", 960, 540)
+  use(wnd)
+  
   @testset "Textures" begin
     @testset "Texture2D" begin
       @testset "basic" begin
@@ -27,15 +29,36 @@ let wnd = window(:texture_test, "Texture Test", 960, 540)
         end
       end
       
+      # IMPORTANT: There seems to be a bug with Int16 & (U)Int32 data types.
+      # For now, what matters is UInt8, Float16, Float32.
       @testset "up/download" begin
         lifetime() do lt
-          raw = reshape(collect(Int32, 1:64), (4, 4, 4))
-          data = reshape([
-            Vec4((raw[x, y, z] for z ∈ 1:4)...) for y ∈ 1:4 for x ∈ 1:4
-          ], (4, 4))
+          T = UInt8
+          
+          data = reshape(
+            [Vec4{T}((i+j for j in 0:3)...) for i in 1:4:64],
+            (4, 4)
+          )
           
           let tex = texture(Texture2D, data; lifetime=lt)
-            
+            @test download_texture(T, tex) == data
+          end
+        end
+        
+        lifetime() do lt
+          T = Float16
+          
+          data = reshape(
+            [Vec4{T}((0.1i for _ in 0:3)...) for i in 1:16],
+            (4, 4)
+          )
+          clipped = reshape(
+            [Vec4{T}((min(c, 1.0) for c in data[y, x])...) for x in 1:4 for y in 1:4],
+            (4, 4)
+          )
+          
+          let tex = texture(Texture2D, data; lifetime=lt)
+            @test isapprox(download_texture(T, tex), clipped; atol=0.01)
           end
         end
       end
@@ -50,4 +73,3 @@ let wnd = window(:texture_test, "Texture Test", 960, 540)
     end
   end
 end
-    
